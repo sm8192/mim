@@ -36,8 +36,16 @@ already present.
 
 ### Database setup
 
-Create the `users` table by running `db/schema.sql` against your Neon database.
-You can paste it into the Neon SQL Editor, or use `psql`:
+Create the `users` table by applying `db/schema.sql`. With `DATABASE_URL` set in
+`.env.local`, run:
+
+```bash
+npm run db:migrate
+```
+
+This runs `scripts/migrate.mjs`, which applies each statement in
+`db/schema.sql` and prints the resulting table columns. Alternatively, paste
+`db/schema.sql` into the Neon SQL Editor, or use `psql`:
 
 ```bash
 psql "$DATABASE_URL" -f db/schema.sql
