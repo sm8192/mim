@@ -1,8 +1,52 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Authentication
+
+This app includes username/password authentication backed by Neon Postgres.
+
+- **Pages:** `/signup`, `/login`, and a protected `/dashboard`.
+- **Server Actions** (`src/app/actions/auth.ts`) handle signup, login, and logout.
+- **Sessions** are stateless, signed JWTs stored in an `httpOnly` cookie (`src/lib/session.ts`), set and cleared via `src/lib/session-cookie.ts`.
+- **Route protection** uses an optimistic cookie check in `src/proxy.ts` plus a secure check in the Data Access Layer (`src/lib/dal.ts`) at the data source.
+- Passwords are hashed with `bcryptjs`; inputs are validated with `zod`.
+
+### Environment variables
+
+Copy `.env.example` to `.env.local` and fill in both values:
+
+```bash
+# Neon Postgres connection string (use the pooled connection string).
+DATABASE_URL=
+
+# Secret used to sign session cookies. Generate one with:
+#   node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+SESSION_SECRET=
+```
+
+Because Neon is already connected to the Vercel deployment, you can pull the
+production values locally with the Vercel CLI:
+
+```bash
+vercel env pull .env.local
+```
+
+`DATABASE_URL` is provided by the Neon integration on Vercel. Still set your own
+`SESSION_SECRET` there (Project Settings → Environment Variables) if it isn't
+already present.
+
+### Database setup
+
+Create the `users` table by running `db/schema.sql` against your Neon database.
+You can paste it into the Neon SQL Editor, or use `psql`:
+
+```bash
+psql "$DATABASE_URL" -f db/schema.sql
+```
+
 ## Getting Started
 
-First, run the development server:
+First, set up your environment variables and database (see
+[Authentication](#authentication) above), then run the development server:
 
 ```bash
 npm run dev
